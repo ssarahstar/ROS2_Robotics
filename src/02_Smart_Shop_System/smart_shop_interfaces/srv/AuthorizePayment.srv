@@ -1,0 +1,7 @@
+string order_id
+int32 amount
+string currency
+---
+bool approved
+string auth_code
+string reason

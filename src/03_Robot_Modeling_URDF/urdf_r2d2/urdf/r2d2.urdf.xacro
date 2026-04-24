@@ -1,0 +1,172 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="r2d2">
+
+  <material name="gray"><color rgba="0.2 0.2 0.2 1"/></material>
+  <material name="white"><color rgba="1 1 1 1"/></material>
+  <material name="blue"><color rgba="0 0 1 1"/></material>
+
+  <xacro:property name="cc_mu" value="0"/>
+  <xacro:property name="cc_kp" value="1000.0"/>
+  <xacro:property name="cc_kd" value="1.0"/>
+
+  <xacro:property name="mass" value="1"/>
+  <xacro:property name="I" value="1e-3"/>
+
+  <xacro:property name="axis_radius" value="0.01"/>
+  <xacro:property name="axis_length" value="0.5"/>
+  <xacro:property name="axis_rpy" value="1.57 0 0"/>
+
+  <xacro:property name="leg_size" value="0.20 0.10 0.8"/>
+  <xacro:property name="leg_origin" value="0 0 -0.3"/>
+  
+  <xacro:property name="leg_y" value="0.40"/>
+
+  <xacro:property name="body_radius" value="0.20"/>
+  <xacro:property name="body_length" value="0.6"/>
+  <xacro:property name="body_visual_origin" value="0 0 -0.2"/>
+  <xacro:property name="body_collision_origin" value="0 0 0.2"/>
+
+  <xacro:property name="head_radius" value="0.4"/>
+
+  <xacro:property name="rod_radius" value="0.02"/>
+  <xacro:property name="rod_length" value="0.2"/>
+  <xacro:property name="rod_visual_origin" value="0 0 -0.1"/>
+
+  <xacro:property name="box_size" value="0.05 0.05 0.05"/>
+
+  <xacro:macro name="contact_coefficients" params="">
+    <contact_coefficients mu="${cc_mu}" kp="${cc_kp}" kd="${cc_kd}"/>
+  </xacro:macro>
+
+  <xacro:macro name="unit_inertial" params="">
+    <inertial>
+      <mass value="${mass}"/>
+      <inertia ixx="${I}" ixy="0" ixz="0" iyy="${I}" iyz="0" izz="${I}"/>
+      <origin/>
+    </inertial>
+  </xacro:macro>
+
+  <xacro:macro name="leg" params="name y">
+    <link name="${name}">
+      <xacro:unit_inertial/>
+      <visual>
+        <origin xyz="${leg_origin}" rpy="0 0 0"/>
+        <geometry><box size="${leg_size}"/></geometry>
+        <material name="white"/>
+      </visual>
+      <collision>
+        <origin xyz="${leg_origin}" rpy="0 0 0"/>
+        <geometry><box size="${leg_size}"/></geometry>
+        <xacro:contact_coefficients/>
+      </collision>
+    </link>
+
+    <joint name="${name}connect" type="fixed">
+      <origin xyz="0 ${y} 0" rpy="0 0 0"/>
+      <parent link="axis"/>
+      <child link="${name}"/>
+    </joint>
+  </xacro:macro>
+
+  <link name="axis">
+    <visual>
+      <origin xyz="0 0 0" rpy="${axis_rpy}"/>
+      <geometry><cylinder radius="${axis_radius}" length="${axis_length}"/></geometry>
+      <material name="gray"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="${axis_rpy}"/>
+      <geometry><cylinder radius="${axis_radius}" length="${axis_length}"/></geometry>
+      <xacro:contact_coefficients/>
+    </collision>
+  </link>
+
+  <xacro:leg name="leg1" y="${leg_y}"/>
+  <xacro:leg name="leg2" y="-${leg_y}"/>
+
+  <link name="body">
+    <xacro:unit_inertial/>
+    <visual>
+      <origin xyz="${body_visual_origin}" rpy="0 0 0"/>
+      <geometry><cylinder radius="${body_radius}" length="${body_length}"/></geometry>
+      <material name="white"/>
+    </visual>
+    <collision>
+      <origin xyz="${body_collision_origin}" rpy="0 0 0"/>
+      <geometry><cylinder radius="${body_radius}" length="${body_length}"/></geometry>
+      <xacro:contact_coefficients/>
+    </collision>
+  </link>
+
+  <joint name="tilt" type="revolute">
+    <parent link="axis"/>
+    <child link="body"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit upper="0" lower="-0.5" effort="10" velocity="10"/>
+  </joint>
+
+  <link name="head">
+    <xacro:unit_inertial/>
+    <visual>
+      <origin xyz="0 0 0.35" rpy="0 0 0"/>
+      <geometry><sphere radius="${head_radius}"/></geometry>
+      <material name="white"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><sphere radius="${head_radius}"/></geometry>
+      <xacro:contact_coefficients/>
+    </collision>
+  </link>
+
+  <joint name="swivel" type="continuous">
+    <origin xyz="0 0 0.1" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <parent link="body"/>
+    <child link="head"/>
+  </joint>
+
+  <link name="rod">
+    <xacro:unit_inertial/>
+    <visual>
+      <origin xyz="${rod_visual_origin}" rpy="0 0 0"/>
+      <geometry><cylinder radius="${rod_radius}" length="${rod_length}"/></geometry>
+      <material name="gray"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><cylinder radius="${rod_radius}" length="${rod_length}"/></geometry>
+      <xacro:contact_coefficients/>
+    </collision>
+  </link>
+
+  <joint name="periscope" type="prismatic">
+    <origin xyz="0.12 0 0.15" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit upper="0" lower="-0.5" effort="10" velocity="10"/>
+    <parent link="head"/>
+    <child link="rod"/>
+  </joint>
+
+  <link name="box">
+    <xacro:unit_inertial/>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><box size="${box_size}"/></geometry>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><box size="${box_size}"/></geometry>
+      <xacro:contact_coefficients/>
+    </collision>
+  </link>
+
+  <joint name="boxconnect" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="rod"/>
+    <child link="box"/>
+  </joint>
+
+</robot>

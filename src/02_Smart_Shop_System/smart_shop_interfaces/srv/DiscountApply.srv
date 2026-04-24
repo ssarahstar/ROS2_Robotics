@@ -1,0 +1,9 @@
+# Request
+string item_id
+int32 original_amount
+---
+# Response
+int32 discounted_amount
+int32 discount_rate
+string reason
+

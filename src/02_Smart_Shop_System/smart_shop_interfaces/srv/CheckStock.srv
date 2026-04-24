@@ -1,0 +1,6 @@
+string item_id
+int32 quantity
+---
+bool available
+int32 remaining
+string reason

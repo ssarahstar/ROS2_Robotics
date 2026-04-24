@@ -1,0 +1,11 @@
+string order_id
+string item_id
+int32 quantity
+int32 amount
+string currency
+---
+bool success
+string status
+string detail
+int32 remaining_stock
+string payment_auth_code

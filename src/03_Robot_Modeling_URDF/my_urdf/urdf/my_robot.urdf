@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<robot name="my_robot">
+
+
+  <material name="blue">
+    <color rgba="0 0 0.8 1"/>
+  </material>
+  <material name="white">
+    <color rgba="1 1 1 1"/>
+  </material>
+  <material name="red">
+    <color rgba="0.8 0 0 1"/>
+  </material>
+
+
+
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <cylinder radius="0.15" length="0.4"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder radius="0.15" length="0.4"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="head">
+    <visual>
+      <geometry>
+        <sphere radius="0.12"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+    <collision>
+      <geometry>
+        <sphere radius="0.12"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="left_arm">
+    <visual>
+      <geometry>
+        <box size="0.4 0.08 0.08"/>
+      </geometry>
+      <material name="red"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.4 0.08 0.08"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="base_to_head" type="fixed">
+    <parent link="base_link"/>
+    <child link="head"/>
+    <origin xyz="0 0 0.3"/>
+  </joint>
+
+  <joint name="base_to_left_arm" type="revolute">
+    <parent link="base_link"/>
+    <child link="left_arm"/>
+    <origin xyz="0 0.2 0.1"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-1.57" upper="1.57" effort="10" velocity="10"/>
+  </joint>
+
+</robot>
